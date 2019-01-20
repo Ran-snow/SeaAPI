@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeaAPI", "SeaAPI\SeaAPI.csproj", "{EE62B64B-07AB-4482-B291-3F85D513CE69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sea.API", "SeaAPI\Sea.API.csproj", "{EE62B64B-07AB-4482-B291-3F85D513CE69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sea.Identity", "Sea.Identity\Sea.Identity.csproj", "{ECB3B2FF-3E55-42D3-85C2-0E7263A28944}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{EE62B64B-07AB-4482-B291-3F85D513CE69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE62B64B-07AB-4482-B291-3F85D513CE69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE62B64B-07AB-4482-B291-3F85D513CE69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECB3B2FF-3E55-42D3-85C2-0E7263A28944}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECB3B2FF-3E55-42D3-85C2-0E7263A28944}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECB3B2FF-3E55-42D3-85C2-0E7263A28944}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECB3B2FF-3E55-42D3-85C2-0E7263A28944}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
