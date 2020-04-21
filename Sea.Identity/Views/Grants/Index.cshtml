@@ -1,4 +1,5 @@
-﻿@model GrantsViewModel
+﻿@using Sea.Identity
+@model GrantsViewModel
 
 <div class="grants">
     <div class="row page-header">
@@ -48,7 +49,7 @@
                             <div class="granttype">Identity Grants</div>
                             <ul>
                                 @foreach (var name in grant.IdentityGrantNames)
-                        {
+                                {
                                     <li>@name</li>
                                 }
                             </ul>

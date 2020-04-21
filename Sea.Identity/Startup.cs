@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Reflection;
+
 using IdentityServer4;
+using IdentityServer4.EntityFramework.DbContexts;
+using IdentityServer4.EntityFramework.Interfaces;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+
+using IdentityServer4.EntityFramework.Mappers;
 
 namespace Sea.Identity
 {
@@ -28,13 +31,22 @@ namespace Sea.Identity
         {
             services.AddMvc();
 
-            var builder = services.AddIdentityServer()
-                .AddInMemoryIdentityResources(Data.GetIdentityResources())
-                .AddInMemoryApiResources(Data.GetApis())
-                .AddInMemoryClients(Data.GetClients())
-                .AddTestUsers(Data.GetUsers());
+            var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            string connectionString = Configuration["ConnectionString"];
 
-            builder.AddDeveloperSigningCredential();
+            services.AddIdentityServer()
+                .AddTestUsers(TestUsers.Users)
+                .AddConfigurationStore(options =>
+                {
+                    options.ConfigureDbContext = b => b.UseSqlServer(connectionString,
+                        sql => sql.MigrationsAssembly(migrationsAssembly));
+                })
+                .AddOperationalStore(options =>
+                {
+                    options.ConfigureDbContext = b => b.UseSqlServer(connectionString,
+                        sql => sql.MigrationsAssembly(migrationsAssembly));
+                })
+                .AddDeveloperSigningCredential();
 
             services.AddAuthentication()
                 .AddOpenIdConnect("oidc", "OpenID Connect", options =>
@@ -59,11 +71,15 @@ namespace Sea.Identity
         {
             if (env.IsDevelopment())
             {
+                //初始化数据库
+                InitializeDatabase(app);
+
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseStaticFiles();
 
+            //使用IDS
             app.UseIdentityServer();
 
             app.UseRouting();
@@ -73,6 +89,47 @@ namespace Sea.Identity
                 endpoints.MapDefaultControllerRoute()
                     .RequireAuthorization();
             });
+        }
+
+        /// <summary>
+        /// 初始化数据库
+        /// </summary>
+        /// <param name="app"></param>
+        private void InitializeDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
+
+                var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+                context.Database.Migrate();
+                if (!context.Clients.Any())
+                {
+                    foreach (var client in SimpleData.GetClients())
+                    {
+                        context.Clients.Add(client.ToEntity());
+                    }
+                    context.SaveChanges();
+                }
+
+                if (!context.IdentityResources.Any())
+                {
+                    foreach (var resource in SimpleData.GetIdentityResources())
+                    {
+                        context.IdentityResources.Add(resource.ToEntity());
+                    }
+                    context.SaveChanges();
+                }
+
+                if (!context.ApiResources.Any())
+                {
+                    foreach (var resource in SimpleData.GetApis())
+                    {
+                        context.ApiResources.Add(resource.ToEntity());
+                    }
+                    context.SaveChanges();
+                }
+            }
         }
     }
 }
