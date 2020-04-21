@@ -22,7 +22,7 @@ namespace Sea.Identity
                     {
                         new Claim("name", "Alice"),
                         new Claim("website", "https://alice.com")
-                    }
+                    },
                 },
                 new TestUser
                 {
@@ -53,6 +53,20 @@ namespace Sea.Identity
             return new List<ApiResource>
             {
                 new ApiResource("api1", "My API")
+                {
+                    Scopes={
+                                new Scope()
+                                {
+                                    Name = "api2.full_access",
+                                    DisplayName = "Full access to API 2",
+                                },
+                                new Scope
+                                {
+                                    Name = "api2.read_only",
+                                    DisplayName = "Read only access to API 2"
+                                }
+                            }
+                }
             };
         }
 
@@ -100,8 +114,8 @@ namespace Sea.Identity
                         new Secret("secret".Sha256())
                     },
 
-                    RedirectUris           = { "http://localhost:44307/signin-oidc" },
-                    PostLogoutRedirectUris = { "http://localhost:44307/signout-callback-oidc" },
+                    RedirectUris           = { "https://localhost:44307/signin-oidc" },
+                    PostLogoutRedirectUris = { "https://localhost:44307/signout-callback-oidc" },
 
 
                     AllowedScopes =
